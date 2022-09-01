@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String?
+  description String?
+  users       User[]
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  username    String
+  email       String        @unique
+  phone_nr    Int
+  role        Role          @relation(fields: [role_id], references: [id])
+  role_id     Int
+  procurement Procurement[]
+  userbranch  UserBranch[]
+  sale        Sales[]
+  credit_sale CreditSales[]
+}
+
+model Dealer {
+  id          Int           @id @default(autoincrement())
+  name        String
+  phone_nr    Int
+  procurement Procurement[]
+}
+
+model Procurement {
+  id                Int      @id @default(autoincrement())
+  date_of_procument DateTime
+  branch_id         Int
+  dealer_id         Int
+  user_id           Int
+  produce_id        Int
+  user              User     @relation(fields: [user_id], references: [id])
+  dealer            Dealer   @relation(fields: [dealer_id], references: [id])
+  produce           Produce  @relation(fields: [produce_id], references: [id])
+}
+
+model Produce {
+  id            Int           @id @default(autoincrement())
+  produce_name  String
+  produce_type  String
+  cost          Int
+  tonnage       Int
+  selling_price Int
+  description   String
+  procurement   Procurement[]
+}
+
+model Branch {
+  id          Int           @id @default(autoincrement())
+  name        String
+  userbranch  UserBranch[]
+  sale        Sales[]
+  credit_sale CreditSales[]
+}
+
+model UserBranch {
+  id         Int      @id @default(autoincrement())
+  start_date DateTime
+  end_date   DateTime
+  user_id    Int
+  branch_id  Int
+  user       User     @relation(fields: [user_id], references: [id])
+  branch     Branch   @relation(fields: [branch_id], references: [id])
+}
+
+model Buyer {
+  id          Int    @id @default(autoincrement())
+  name        String
+  phone_nr    Int
+  national_id String
+  location    String
+
+  sale        Sales[]
+  credit_sale CreditSales[]
+}
+
+model Sales {
+  id           Int      @id @default(autoincrement())
+  produce_id   Int
+  buyer_id     Int
+  user_id      Int
+  branch_id    Int
+  amount_paid  Int
+  date_of_sale DateTime
+  buyer        Buyer    @relation(fields: [buyer_id], references: [id])
+  user         User     @relation(fields: [user_id], references: [id])
+  branch       Branch   @relation(fields: [branch_id], references: [id])
+}
+
+model CreditSales {
+  id               Int      @id @default(autoincrement())
+  produce_id       Int
+  buyer_id         Int
+  user_id          Int
+  branch_id        Int
+  amount_due       Int
+  due_date         DateTime
+  date_of_dispatch DateTime
+  buyer            Buyer    @relation(fields: [buyer_id], references: [id])
+  user             User     @relation(fields: [user_id], references: [id])
+  branch           Branch   @relation(fields: [branch_id], references: [id])
+}
