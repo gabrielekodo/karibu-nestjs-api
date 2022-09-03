@@ -23,7 +23,7 @@ export class ProduceService {
 
   //add produce
   async addProduce(data) {
-    const produce = await this.prismaService.produce.create({ data: data });
+    const produce = await this.prismaService.produce.create({ data:data });
     return produce;
   }
 
